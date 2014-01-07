@@ -6,6 +6,7 @@
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
+var map = require('./routes/map')
 var http = require('http');
 var path = require('path');
 var passport = require('./util/passport');
@@ -59,6 +60,9 @@ app.get('/user/logout', function(req, res){
     req.logout();
     res.redirect('/');
 });
+
+//map
+app.get('/map', map.viewMap);
 
 
 
