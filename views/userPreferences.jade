@@ -1,0 +1,41 @@
+extends layout
+
+block content
+	h3 Your preferences
+	p Like Mediterranean food? How about walks in the park? Help us recommend a better day plan for you!
+
+	#questionsContainer
+			div.container.questions
+				div.row
+					#question.col-xs-6
+						
+					div.col-xs-3
+						button(type='button', class="btn btn-danger", onclick="respondPositive();")  Nope! 
+					div.col-xs-3
+						button(type='button', class="btn btn-success" onclick="respondNegative();")  Yeah!
+
+
+
+	script(type='text/javascript').
+		var index = 0;
+		var foodChoices = ["American", "Greek", "Armenian"];
+		var foodResponses = [];
+		function renderChoice(){
+			// we're at the end of the rope
+			if(index == foodChoices.length){
+				return console.log('doneso!');
+			}
+			else{
+				$('#question').text(foodChoices[index]);
+				index++;
+			}
+		}
+		function respondPositive(){
+			foodResponses.push(true);
+			renderChoice();
+		}
+		function respondNegative(){
+			foodResponses.push(false);
+			renderChoice();
+		}
+		renderChoice();

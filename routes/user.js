@@ -14,6 +14,15 @@ exports.list = function(req, res){
   res.send("respond with a resource");
 };
 
+
+
+/*
+ * user/preferences
+ */
+exports.viewPreferences = function(req, res){
+	res.render('userPreferences', {msg: req.flash('error')});
+}
+
 /*
  * user/login
  *

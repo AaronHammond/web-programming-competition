@@ -6,7 +6,8 @@
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
-var map = require('./routes/map')
+var map = require('./routes/map');
+var data = require('./routes/data');
 var http = require('http');
 var path = require('path');
 var passport = require('./util/passport');
@@ -56,6 +57,8 @@ app.post('/user/login', user.doLogin);
 app.get('/user/register', user.viewRegister);
 app.post('/user/register', user.doRegister);
 
+app.get('/user/preferences', user.viewPreferences);
+
 app.get('/user/logout', function(req, res){
     req.logout();
     res.redirect('/');
@@ -64,6 +67,9 @@ app.get('/user/logout', function(req, res){
 //map
 app.get('/map', map.viewMap);
 
+// data
+
+app.get('/data/restaurants', data.getRestaurants);
 
 
 
