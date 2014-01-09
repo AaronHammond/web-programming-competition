@@ -70,6 +70,8 @@ app.get('/map', map.viewMap);
 // data
 
 app.get('/data/restaurants', data.getRestaurants);
+app.get('/data/bars', data.getBars);
+app.get('/data/parks', data.getParks);
 
 
 

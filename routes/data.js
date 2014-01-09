@@ -7,9 +7,19 @@ var yelp = require('yelp').createClient({
 
 
 exports.getRestaurants = function (req, res) {
-	yelp.search({/*term: "food", */ radius_filter: 3000, category_filter: "food,bars,parks", sort: 1, ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
-	  console.log(error);
-	  console.log(data);
+	yelp.search({radius_filter: 1500, category_filter: "food", sort: "0", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
+	  res.send(data);
+	});
+}
+
+exports.getParks = function (req, res) {
+	yelp.search({radius_filter: 1500, category_filter: "parks", sort: "0", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
+	  res.send(data);
+	});
+}
+
+exports.getBars = function (req, res) {
+	yelp.search({radius_filter: 1500, category_filter: "bars", sort: "0", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
 	  res.send(data);
 	});
 }
