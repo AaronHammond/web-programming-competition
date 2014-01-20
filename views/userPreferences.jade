@@ -1,18 +1,14 @@
 extends layout
 
 block content
-	h3 Your preferences
-	p Like Mediterranean food? How about walks in the park? Help us recommend a better day plan for you!
+	div(class="callout")
+		h3 Your preferences
+		p. 
+			Like Mediterranean food? How about walks in the park? Help us recommend a better day plan for you! <br />
+			Answer as many or as few as you'd like.
 
-	#questionsContainer
-			div.container.questions
-				div.row
-					#question.col-xs-6
-						
-					div.col-xs-3
-						button(type='button', class="btn btn-danger", onclick="respondPositive();")  Nope! 
-					div.col-xs-3
-						button(type='button', class="btn btn-success" onclick="respondNegative();")  Yeah!
+		#questionsContainer
+		button(id="savePreferences" type="button" class="btn btn-success" style='float: right;') Save
 
 
 
@@ -20,22 +16,79 @@ block content
 		var index = 0;
 		var foodChoices = ["American", "Greek", "Armenian"];
 		var foodResponses = [];
-		function renderChoice(){
-			// we're at the end of the rope
-			if(index == foodChoices.length){
-				return console.log('doneso!');
+
+		function renderCategories(response){
+			
+			var markup = '<div class="panel-group" id="preferencesAccordion">';
+			for(var i in response.metacategories){
+				markup += metacategoryMarkup(response.metacategories[i], response.subcategories);
 			}
-			else{
-				$('#question').text(foodChoices[index]);
-				index++;
+			markup += '</div>';
+
+			$('#questionsContainer').html(markup);
+		}
+
+		function metacategoryMarkup(metacategory, subcategories){
+
+			var markup = "";
+			markup += '<div class="panel panel-default">';
+			markup += '		<div class="panel-heading">';
+			markup += '			 <h4 class="panel-title">';
+			markup += '				<a data-toggle="collapse" data-parent="#preferencesAccordion" href="#collapse' + metacategory.refName + '">';
+			markup += '					' + metacategory.displayName;
+			markup += '				</a>';
+			markup += '			 </h4>';
+			markup += '		</div>';
+			markup += '		<div id="collapse' + metacategory.refName + '" class="panel-collapse collapse">';
+			markup += '			<div class="panel-body">';
+			markup += subcategoryMarkup(subcategories[metacategory.refName]);
+			markup += '			</div>';
+			markup += '		</div>';
+			markup += '</div>';
+
+			return markup;
+		}
+
+		function subcategoryMarkup(subcategories){
+
+			markup = '';
+			for(var i in subcategories){
+				var choice = subcategories[i];
+				markup += '<div class="choice">';
+				markup += '		<div class="choiceLabel">';
+				markup += 			choice.displayName + '?';
+				markup += '		</div>';
+				markup += '		<div class="btn-group choiceBtnGroup" data-toggle="buttons">';
+				markup += '			<label class="btn btn-danger">';
+				markup += '				<input type="radio" name="' + choice.refName +'" value="no"> No';
+				markup += '			</label>';
+				markup += '			<label class="btn btn-primary">';
+				markup += '				<input type="radio" name="' + choice.refName +'" value="meh"> Meh';
+				markup += '			</label>';
+				markup += '			<label class="btn btn-success">';
+				markup += '			<input type="radio" name="' + choice.refName +'" value="yes"> Yes';
+				markup += '			</label>';
+				markup += '		</div>';
+				markup += '</div>';
+				markup += '<br />'
 			}
+
+			return markup;
 		}
-		function respondPositive(){
-			foodResponses.push(true);
-			renderChoice();
-		}
-		function respondNegative(){
-			foodResponses.push(false);
-			renderChoice();
-		}
-		renderChoice();
+
+		$.ajax({
+			url: "/preferences/list",
+			cache: false
+		}).done(function(response){
+			renderCategories(response);
+			$('.btn').button();
+		});
+
+		$('#savePreferences').on('click', function(){
+			var results = $('input:checked');
+			var newPrefs = []; 
+			for(var i = 0; i < results.length; i++){
+				newPrefs.push({subcategory : results[i].name, preference : results[i].value});
+			}
+			console.log(newPrefs);	
+		});

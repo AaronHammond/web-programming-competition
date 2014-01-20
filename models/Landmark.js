@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var LandmarkSchema = new Schema({
-    venueType : { type: String, enum: ["restaurant", "park", "cinema"]},
+    venueType : { type: String, enum: ["restaurant", "park", "bar"]},
     latitude : Number,
     longitude : Number
 });

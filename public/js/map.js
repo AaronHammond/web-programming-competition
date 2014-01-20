@@ -26,11 +26,13 @@ function initialize() {
 		origin = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 		var mapOptions = {
 			center: origin,
-			zoom: 17
+			zoom: 17,
+			noClear: true
 		};
-		directionsDisplay = new google.maps.DirectionsRenderer();
+		directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: true});
 		map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 		directionsDisplay.setMap(map);
+
 
 		$('#directions_panel').text('loading...');
 		retrieveLandmarkData("bars", function(){
@@ -55,6 +57,11 @@ function errythingLoaded(){
 
 	generateItinerary();
 	getDirections();
+
+	$('#loading-pane').fadeOut('slow', function () {
+		$('#main-content').animate({opacity: "1.0"}, 1000);
+	});
+	
 }
 
 
@@ -65,7 +72,7 @@ function errythingLoaded(){
  */
 function retrieveLandmarkData(category, callback) {
 	$.ajax({
-		url: "/data/" + category + "?lat=" + origin.b + "&long=" + origin.d,
+		url: "/data/" + category + "?lat=" + origin.d + "&long=" + origin.e,
 		cache: false
 	}).done(function(yelpData){
 		targetCounts[category] = yelpData.businesses.length;
@@ -122,13 +129,16 @@ function checkCounts(){
 function addMapPin(landmark) {
 	var point = landmark.mapData.geometry.location;
 	var markerPos = new google.maps.LatLng(point.lat, point.lng);
-	marker = new google.maps.Marker({
+
+	var marker = new google.maps.Marker({
 		map:map,
 		animation: google.maps.Animation.DROP,
 		position: markerPos,
 		title: landmark.yelpData.name,
 		icon: getMarkerImage(landmark.yelpData) 
 	});
+
+	landmark.marker = marker;
 }
 
 /*
@@ -163,7 +173,35 @@ function getMarkerImage(datum){
  */
 function generateItinerary() {
 	itinerary = [landmarks.restaurants[0], landmarks.parks[0], landmarks.bars[0]];
+
+	for(var i in itinerary){
+		var landmark = itinerary[i];
+
+		var infowindow = new google.maps.InfoWindow({
+			content : getFlavorText(landmark)
+		})
+
+		infowindow.open(map, landmark.marker);
+	}
 }
+
+function getFlavorText(landmark) {
+	var cat = landmark.yelpData.metacategory;
+	var flavorText;
+	if(cat == "restaurants"){
+		flavorText = "Enjoy a nice meal at ";
+	}
+	if(cat == "parks"){
+		flavorText = "Take a stroll through ";
+	}
+	if(cat == "bars"){
+		flavorText = "Order a brew (or two!) at ";
+	}
+
+	flavorText = flavorText.concat(landmark.yelpData.name);
+	return flavorText;
+}
+
 
 /*
  * given an index for an itinerary part, replace the stateful itinerary part with another option
@@ -198,16 +236,34 @@ function getDirections(){
 		if (status == google.maps.DirectionsStatus.OK) {
 			directionsDisplay.setDirections(response);
 			var route = response.routes[0];
-			var summaryPanel = document.getElementById("directions_panel");
-			summaryPanel.innerHTML = "";
+
+			$('#directions_panel').html('');
+
+			var innerHTML = "<b>1.</b> Leave your goddamn house. <br />";
+
+			var locCtr = 1;
+
 			// For each route, display summary information.
 			for (var i = 0; i < route.legs.length; i++) {
-				var routeSegment = i+1;
-				summaryPanel.innerHTML += "<b>Route Segment: " + routeSegment + "</b><br />";
-				summaryPanel.innerHTML += route.legs[i].start_address + " to ";
-				summaryPanel.innerHTML += route.legs[i].end_address + "<br />";
-				summaryPanel.innerHTML += route.legs[i].distance.text + "<br /><br />";
+				locCtr++;
+
+				for(var j = 0; j < (route.legs[i].steps.length); j++){
+					innerHTML += extractLastGoogleMapStep(route.legs[i].steps[j]);
+					//innerHTML += (route.legs[i].steps[j].instructions + " for " + route.legs[i].steps[j].duration.text + " (" + route.legs[i].steps[j].distance.text + ")");
+					//innerHTML += "<br />";
+				}
+				
+
+
+
+				innerHTML += (locCtr + ". " + getFlavorText(itinerary[i]));
+				innerHTML += "<br />";
+				if(i+1 != route.legs.length){
+					innerHTML += "Onto the next stop! <br />";
+				}
 			}
+			innerHTML += "Congratulations! Your life was less meaningless today.";
+			$('#directions_panel').html(innerHTML);
 		}
 	});
 }
@@ -223,4 +279,22 @@ function flattenNestedArrays(array){
 		newArray = newArray.concat(array[subarray]);
 	}
 	return newArray;
+}
+
+function extractLastGoogleMapStep(step){
+	var ind = step.instructions.indexOf('<div style="font-size:0.9em">');
+	if(ind != -1){
+		
+		var stepHtml = "";
+		stepHtml += step.instructions.substring(0, ind);
+		stepHtml += (" for " + step.duration.text + " (" + step.distance.text + ")");
+		stepHtml += "<br />";
+		stepHtml += step.instructions.substring(ind);
+		stepHtml += "<br />";
+
+		return stepHtml;
+	}
+	else{
+		return (step.instructions + " for " + step.duration.text + " (" + step.distance.text + ") <br />");
+	}
 }

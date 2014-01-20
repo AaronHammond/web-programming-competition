@@ -8,6 +8,7 @@ var routes = require('./routes');
 var user = require('./routes/user');
 var map = require('./routes/map');
 var data = require('./routes/data');
+var preferences = require('./routes/preferences');
 var http = require('http');
 var path = require('path');
 var passport = require('./util/passport');
@@ -72,6 +73,11 @@ app.get('/map', map.viewMap);
 app.get('/data/restaurants', data.getRestaurants);
 app.get('/data/bars', data.getBars);
 app.get('/data/parks', data.getParks);
+
+// preferences
+
+app.get('/preferences/list', preferences.getVenues);
+app.post('/preferences', preferences.setPreferences);
 
 
 

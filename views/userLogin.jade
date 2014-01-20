@@ -1,5 +1,15 @@
 extends layout
 
 block content
-	h5 #{msg}
-	| welp plebl
+	div.callout
+		if(msg != "")
+			div(class="alert alert-danger")
+				| #{msg}
+		form.form-signin(action='/user/login', method='post', role='form')
+			h2.form-signin-heading Login
+			input(type='text', name='username', placeholder='Username', class='input-block-level')
+			input(type='password', name='password', placeholder='Password', class='input-block-level')
+			input(type='submit', class='btn btn-large btn-primary', value="Login")
+			|<br /> <br />
+			a(href='/user/register') 
+				| Or register...

@@ -20,6 +20,7 @@ exports.list = function(req, res){
  * user/preferences
  */
 exports.viewPreferences = function(req, res){
+	console.log(req.user);
 	res.render('userPreferences', {msg: req.flash('error')});
 }
 
@@ -66,7 +67,7 @@ exports.doLogin = passport.authenticate('local', {successRedirect: '/map',
 			        return res.redirect('/user/login');
 			    }
 
-	    		return res.redirect('/users/profile');
+	    		return res.redirect('/user/preferences');
 			});
 		});
 	});

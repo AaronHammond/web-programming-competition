@@ -1,5 +1,28 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+	#accordion.panel-group			
+		.panel.panel-default
+			.panel-heading
+				h4.panel-title
+					a(data-toggle='collapse', data-parent='#accordion', href='#collapseOne')
+						| Collapsible Group Item #1
+			#collapseOne.panel-collapse.collapse.in
+				.panel-body
+					| durrddrrr
+		.panel.panel-default
+			.panel-heading
+				h4.panel-title
+					a(data-toggle='collapse', data-parent='#accordion', href='#collapseTwo')
+						| Collapsible Group Item #2
+			#collapseTwo.panel-collapse.collapse
+				.panel-body
+					| hurrrr
+		.panel.panel-default
+			.panel-heading
+				h4.panel-title
+					a(data-toggle='collapse', data-parent='#accordion', href='#collapseThree')
+						| Collapsible Group Item #3
+			#collapseThree.panel-collapse.collapse
+				.panel-body
+					| durrddrrdasdasdas
