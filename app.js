@@ -78,6 +78,7 @@ app.get('/data/parks', data.getParks);
 
 app.get('/preferences/list', preferences.getVenues);
 app.post('/preferences', preferences.setPreferences);
+app.get('/preferences', preferences.getPreferences);
 
 
 

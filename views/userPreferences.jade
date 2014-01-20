@@ -82,6 +82,17 @@ block content
 		}).done(function(response){
 			renderCategories(response);
 			$('.btn').button();
+
+			$.ajax({
+				url: "/preferences"	
+			}).done(function(response){
+				for(var i = 0; i < response.length; i++){
+					response[i].subcategory
+					response[i].preference
+					$('input[name="' + response[i].subcategory + '"][value="' + response[i].preference + '"]').parent().button('toggle');
+				}
+			});
+
 		});
 
 		$('#savePreferences').on('click', function(){

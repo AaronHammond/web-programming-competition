@@ -4,7 +4,7 @@ var User = require('../models/User');
 var passport = require('../util/passport');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
+var Preferences = require('../models/Preferences');
 
 /*
  * GET users listing.
@@ -55,19 +55,31 @@ exports.doLogin = passport.authenticate('local', {successRedirect: '/map',
 	
 		user = new User({	username: req.param('username'),
 							password: req.param('password')});
-		user.save(function (err, doc){
+		user.save(function (err, docuser){
 			if(err){
 	    		req.flash('error', err);
 	    		return res.redirect('/user/register');
 			}
 
-			req.login(doc, function(err){
-			    if(err){
-			        req.flash('error', 'Your account was created. Please log in.');
-			        return res.redirect('/user/login');
-			    }
+			// create the preferences set
+			preferences = new Preferences({owner : docuser._id, preferences : []});
+			preferences.save(function(err, doc){
+				if(err){
+					req.flash('error', err);
+					return res.redirect('/user/register');
+				}
 
-	    		return res.redirect('/user/preferences');
+				console.log(docuser);
+				req.logIn(docuser, function(err){
+					console.log(err);
+					console.log("logged in after registration");
+				    if(err){
+				        req.flash('error', 'Your account was created. Please log in.');
+				        return res.redirect('/user/login');
+				    }
+
+	    			return res.redirect('/user/preferences');
+				});
 			});
 		});
 	});
