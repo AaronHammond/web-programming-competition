@@ -94,12 +94,24 @@ block content
 			});
 
 		});
-
+		$('#savePreferences').popover({content : 'Your preferences have been saved.', placement: 'right', trigger: 'manual' });
 		$('#savePreferences').on('click', function(){
 			var results = $('input:checked');
 			var newPrefs = []; 
 			for(var i = 0; i < results.length; i++){
 				newPrefs.push({subcategory : results[i].name, preference : results[i].value});
 			}
-			console.log(newPrefs);	
+			console.log(newPrefs);
+
+			$.ajax({
+				contentType: 'application/json',
+				data: JSON.stringify(newPrefs),
+				dataType: 'json',
+				type: 'POST',
+				url: '/preferences'
+			}).done(function(response){
+				console.log(response);
+				$('#savePreferences').popover('show');
+			});
+
 		});

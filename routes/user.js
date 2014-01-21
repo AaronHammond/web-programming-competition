@@ -6,21 +6,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Preferences = require('../models/Preferences');
 
-/*
- * GET users listing.
- */
-
-exports.list = function(req, res){
-  res.send("respond with a resource");
-};
-
-
 
 /*
  * user/preferences
  */
 exports.viewPreferences = function(req, res){
-	console.log(req.user);
+	if(!req.user){
+		return res.redirect('/user/login');
+	}
 	res.render('userPreferences', {msg: req.flash('error')});
 }
 

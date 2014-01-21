@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var PreferencesSchema = new Schema({
-    preferences: [Object],
+    preferences: [{subcategory: String, preference: String}],
     owner: Schema.Types.ObjectId
 });
 
