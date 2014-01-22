@@ -21,6 +21,7 @@ var directionsService = new google.maps.DirectionsService();
 
 var directionsDisplay;
 
+var originMarker; 
 function initialize() {
 	navigator.geolocation.getCurrentPosition(function (position) {
 		origin = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -33,14 +34,66 @@ function initialize() {
 		map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
 		directionsDisplay.setMap(map);
 
-
-		$('#directions_panel').text('loading...');
-		retrieveLandmarkData("bars", function(){
-			retrieveLandmarkData("parks", function(){
-				retrieveLandmarkData("restaurants", errythingLoaded);
-			});
+		originMarker = new google.maps.Marker({
+			map:map,
+			animation: google.maps.Animation.DROP,
+			position: origin,
+			title: "Your itinerary will start here.", 
 		});
+
+		$('#startBtn').click(function(){
+			$('#initialPane').text('loading...');
+			retrieveLandmarkData("bars", function(){
+					retrieveLandmarkData("parks", function(){
+						retrieveLandmarkData("restaurants", errythingLoaded);
+					});
+			});	
+		});
+
+		$('#somewhereElseBtn').click(function(){
+			originMarker.setMap(null);
+			$('#startBtn').fadeOut('slow');
+			$('#somewhereElseBtn').fadeOut('slow', function(){
+				$('#somewhereElsePane').fadeIn('slow');
+			});
+			$('#startHereBtn').click(startSomewhereElse);
+			
+		})
+		
+		
 	});		
+}
+
+function startSomewhereElse(){
+	var newAddress = $('#somewhereElseAddress').val();
+
+	$.ajax({
+		url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + newAddress + "&sensor=true",
+		cache: false
+	}).done(function(gmapData){
+
+
+		if(gmapData.results.length > 0){
+			var landmark = gmapData.results[0];
+			var point = landmark.geometry.location;
+			origin = new google.maps.LatLng(point.lat, point.lng);
+			originMarker = new google.maps.Marker({
+				map:map,
+				animation: google.maps.Animation.DROP,
+				position: origin,
+				title: "Your itinerary will start here." 
+			});
+			map.setCenter(origin);
+			$('#somewhereElsePane').fadeOut('slow', function(){
+				$('#startBtn').fadeIn('slow');
+				$('#somewhereElseBtn').fadeIn('slow');
+			});
+		}
+		else{
+			$('#somewhereElseLabel').text("Sorry, we couldn't find that address. Try again!");
+		}
+		
+	});
 }
 
 
@@ -58,8 +111,9 @@ function errythingLoaded(){
 	generateItinerary();
 	getDirections();
 
-	$('#loading-pane').fadeOut('slow', function () {
-		$('#main-content').animate({opacity: "1.0"}, 1000);
+	$('#initialPane').fadeOut('slow', function () {
+		$('#itinerary').css('display', 'inline-block');
+		$('#itinerary').fadeIn('slow');
 	});
 	
 }
@@ -146,16 +200,6 @@ function addMapPin(landmark) {
  */
 function getMarkerImage(datum){
 	// determine the appropriate marker
-	/*var categories = flattenNestedArrays(datum.categories);
-	if(categories.indexOf("bars") != -1){
-		return "/images/map-icons/bar.png"
-	}
-	else if(categories.indexOf("parks") != -1){
-		return "/images/map-icons/park.png"
-	}
-	else {
-		return "/images/map-icons/food.png"
-	}*/
 
 	if(datum.metacategory == "bars"){
 		return "/images/map-icons/bar.png"
@@ -172,17 +216,24 @@ function getMarkerImage(datum){
  * populates the itinerary object with an array of landmarks that constitute an itinerary.
  */
 function generateItinerary() {
-	itinerary = [landmarks.restaurants[0], landmarks.parks[0], landmarks.bars[0]];
+	populateItinerary();
 
 	for(var i in itinerary){
 		var landmark = itinerary[i];
 
 		var infowindow = new google.maps.InfoWindow({
-			content : getFlavorText(landmark)
+			content : getMarkerHTML(landmark)
 		})
 
 		infowindow.open(map, landmark.marker);
 	}
+}
+
+function populateItinerary(){
+	itinerary = [];
+	itinerary.push(landmarks.restaurants[Math.floor((Math.random()*landmarks.restaurants.length))]);
+	itinerary.push(landmarks.parks[Math.floor((Math.random()*landmarks.parks.length))]);
+	itinerary.push(landmarks.bars[Math.floor((Math.random()*landmarks.bars.length))]);
 }
 
 function getFlavorText(landmark) {
@@ -200,6 +251,17 @@ function getFlavorText(landmark) {
 
 	flavorText = flavorText.concat(landmark.yelpData.name);
 	return flavorText;
+}
+
+function getMarkerHTML(landmark){
+	var markup = "";
+	markup += '<img src="' + landmark.yelpData.image_url + '" style="width: 50px" />';
+	markup += '<h5 style="margin-bottom: 0px;"><a target="_blank" href="' + landmark.yelpData.url + '">' + landmark.yelpData.name+'</a></h5>';
+	markup += createAddressFromYelpLocation(landmark.yelpData.location);
+	markup += '<br />';
+	markup += '<img src="' + landmark.yelpData.rating_img_url_small + '" />';
+
+	return markup;
 }
 
 
@@ -236,38 +298,49 @@ function getDirections(){
 		if (status == google.maps.DirectionsStatus.OK) {
 			directionsDisplay.setDirections(response);
 			var route = response.routes[0];
-
-			$('#directions_panel').html('');
-
-			var innerHTML = "<b>1.</b> Leave your goddamn house. <br />";
-
-			var locCtr = 1;
-
-			// For each route, display summary information.
-			for (var i = 0; i < route.legs.length; i++) {
-				locCtr++;
-
-				for(var j = 0; j < (route.legs[i].steps.length); j++){
-					innerHTML += extractLastGoogleMapStep(route.legs[i].steps[j]);
-					//innerHTML += (route.legs[i].steps[j].instructions + " for " + route.legs[i].steps[j].duration.text + " (" + route.legs[i].steps[j].distance.text + ")");
-					//innerHTML += "<br />";
-				}
-				
-
-
-
-				innerHTML += (locCtr + ". " + getFlavorText(itinerary[i]));
-				innerHTML += "<br />";
-				if(i+1 != route.legs.length){
-					innerHTML += "Onto the next stop! <br />";
-				}
-			}
-			innerHTML += "Congratulations! Your life was less meaningless today.";
-			$('#directions_panel').html(innerHTML);
+			renderDirections(route);
 		}
 	});
 }
 
+
+function renderDirections(route){
+	
+	$('#directions_panel').html('');
+
+	var markup = '<div class="panel-group" id="directionsAccordionn">';
+
+	for(var i = 0; i < route.legs.length; i++){
+		markup += '<div class="panel panel-default">';
+		markup += '		<div class="panel-heading">';
+		markup += '			 <h4 class="panel-title">';
+		markup += '				<a data-toggle="collapse" data-parent="#directionsAccordion" href="#collapse' + i + '">';
+		markup += '					' + (i+1) + ". " + getFlavorText(itinerary[i]);
+		markup += '				</a>';
+		markup += ' 			<span class="btn btn-danger" style="float: right; font-size: 12px; vertical-align: middle; margin-top: -7px;"> No! </span>';
+		markup += '			 </h4>';
+		markup += '		</div>';
+		markup += '		<div id="collapse' + i + '" class="panel-collapse collapse">';
+		markup += '			<div class="panel-body">';
+		markup += renderLeg(route.legs[i]);
+		markup += '			</div>';
+		markup += '		</div>';
+		markup += '</div>';
+	}
+
+	markup += "</div>";
+
+	$('#directions_panel').html(markup);
+	
+}
+
+function renderLeg(leg){
+	var innerHTML = "";
+	for(var j = 0; j < (leg.steps.length); j++){
+			innerHTML += extractLastGoogleMapStep(leg.steps[j]);
+	}
+	return innerHTML;
+}
 
 
 /*
@@ -289,8 +362,8 @@ function extractLastGoogleMapStep(step){
 		stepHtml += step.instructions.substring(0, ind);
 		stepHtml += (" for " + step.duration.text + " (" + step.distance.text + ")");
 		stepHtml += "<br />";
-		stepHtml += step.instructions.substring(ind);
-		stepHtml += "<br />";
+		//stepHtml += step.instructions.substring(ind);
+		//stepHtml += "<br />";
 
 		return stepHtml;
 	}

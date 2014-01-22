@@ -3,9 +3,14 @@ html(style='height: 100%')
 	head
 
 		meta(name='viewport', content='initial-scale=1.0, user-scalable=no')
+		link(rel='stylesheet', href='/css/bootstrap.css')
+		link(rel='stylesheet', href='/css/preferences.css')
+		//link(href="http://fonts.googleapis.com/css?family=Lobster:400" rel="stylesheet" type="text/css")
 		script(type='text/javascript', src='/js/jquery-1.10.2.js')
 		script(type='text/javascript', src='/js/bootstrap.js')
-		link(type='stylesheet', href='/css/bootstrap.css')
+
+		script(type='text/javascript', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAYb9WeDx9yd4CQd_e6lcb3NueQyqw-7Wo&sensor=false')
+		script(type='text/javascript', src='/js/map.js')
 
 		style(type='text/css').
 			
@@ -16,45 +21,79 @@ html(style='height: 100%')
 			}
 			#map-canvas {
 				height: 80%;
-				width: 60%;
+				width: 50%;
 				margin-left: 5%;
-				margin-top: 2%;
+				margin-top: 15px;
 				display: inline-block;
 			}
 			#itinerary {
 				height: 80%;
-				margin-top: 2%;
+				margin-top: 15px;
+				display: none;
+				vertical-align: top;
+				margin-left: 2%;
+				width: 40%;
+			}
+			#initialPane {
+				height: 80%;
+				margin-top: 15px;
 				display: inline-block;
 				vertical-align: top;
 				margin-left: 2%;
-				width: 30%;
+				width: 40%;
+				text-align: center;
+			}
+			#initialPane > button {
+				margin-right: 10px;
+			}
+			#somewhereElsePane {
+				display: none;
 			}
 			#main-content {
-				opacity: 0;
+				//opacity: 0;
 				height: 100%;
 				width: 100%;
 			}
 			#loading-pane {
 				text-align: center;
+				display: none;
 			}
 			#toolbar {
 				margin-top: 3%;
 				margin-left: 5%;
 				margin-right: 5%;
 			}
+			.panel {
+				margin-bottom: 20px;
+			}
+			.panel-body {
+				font-size: 17px;
+			}
+			#startHereBtn {
+				margin-top: 10px;
+			}
 	body
-		script(type='text/javascript', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAYb9WeDx9yd4CQd_e6lcb3NueQyqw-7Wo&sensor=false')
-		script(type='text/javascript', src='/js/map.js')
+		
 
 
 		div(id="toolbar")
-			div(id="logo") what the fuck should i do today
+			div(id="logo") 
+				h2 what the fuck should i do today
 			hr
+		div(id='init-pane')
 
-		div(id='loading-pane') Loading...
 		div(id='main-content')
 			div(id='map-canvas')
-			div(id='itinerary') Your itinerary
+			div(id='initialPane')
+				button(type='button' class='btn btn-success' id='startBtn') Generate Itinerary
+				button(type='button' class='btn btn-danger' id='somewhereElseBtn') Start Somewhere Else
+				div(id="somewhereElsePane")
+					div(class='form-group')
+					label(for='somewhereElseAddress' id='somewhereElseLabel') Please enter an address:
+					input(id="somewhereElseAddress" class='form-control' placeholder="Enter an address")
+					button(type = 'button' class='btn btn-success' id='startHereBtn') Start Here
+			div(id='itinerary') 
+				h3 Your itinerary
 				div(id="directions_panel")
 
 				
