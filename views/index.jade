@@ -1,28 +1,8 @@
 extends layout
 
 block content
-	#accordion.panel-group			
-		.panel.panel-default
-			.panel-heading
-				h4.panel-title
-					a(data-toggle='collapse', data-parent='#accordion', href='#collapseOne')
-						| Collapsible Group Item #1
-			#collapseOne.panel-collapse.collapse.in
-				.panel-body
-					| durrddrrr
-		.panel.panel-default
-			.panel-heading
-				h4.panel-title
-					a(data-toggle='collapse', data-parent='#accordion', href='#collapseTwo')
-						| Collapsible Group Item #2
-			#collapseTwo.panel-collapse.collapse
-				.panel-body
-					| hurrrr
-		.panel.panel-default
-			.panel-heading
-				h4.panel-title
-					a(data-toggle='collapse', data-parent='#accordion', href='#collapseThree')
-						| Collapsible Group Item #3
-			#collapseThree.panel-collapse.collapse
-				.panel-body
-					| durrddrrdasdasdas
+	div.callout
+		h3 New in town? Looking for something to do?
+		p Moving to a new place can be hard. Aside from meeting people, it can be a challenge to just figure out what to do on a lazy afternoon. We take the guess work out of free by suggesting itineraries based on what you like to do. So, sign up and get ready to explore your community.
+		div(style="text-align: center;")
+			a(href="/user/register" class="btn btn-success") Sign up

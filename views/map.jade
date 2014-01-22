@@ -77,8 +77,16 @@ html(style='height: 100%')
 
 
 		div(id="toolbar")
-			div(id="logo") 
-				h2 what the fuck should i do today
+			div(id="logo")
+				h2 what should i do today?
+				a(href="/user/preferences") Preferences
+				a(href="/map") New Itinerary
+				//a Saved Itineraries
+				if user
+					a(href="/user/logout") Log Out
+				else
+					a(href="/user/login") Log In
+
 			hr
 		div(id='init-pane')
 

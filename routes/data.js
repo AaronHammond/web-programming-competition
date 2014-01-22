@@ -10,19 +10,19 @@ var yelp = require('yelp').createClient({
 
 
 exports.getRestaurants = function (req, res) {
-	yelp.search({radius_filter: 1500, category_filter: "restaurants", sort: "0", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
+	yelp.search({category_filter: "restaurants", sort: "1", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
 		cullAndPassThru(data, req, res);
 	});
 }
 
 exports.getParks = function (req, res) {
-	yelp.search({radius_filter: 1500, category_filter: "parks,landmarks,galleries,museums", sort: "0", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
+	yelp.search({category_filter: "parks,landmarks,galleries,museums", sort: "1", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
 		cullAndPassThru(data, req, res);
 	});
 }
 
 exports.getBars = function (req, res) {
-	yelp.search({radius_filter: 1500, category_filter: "bars", sort: "0", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
+	yelp.search({category_filter: "bars", sort: "1", ll: req.param('lat') + ',' + req.param('long')}, function(error, data) {
 		cullAndPassThru(data, req, res);
 	});
 }

@@ -30,13 +30,22 @@
 	margin-top: 3%;
 	margin-left: 5%;
 	margin-right: 5%;
-	
+	width: 90%;
 }
 
 #logo > h2 {
 	font-family: 'Lobster';
+	display: inline-block;
+	min-width: 70%;
+}
+#logo > a {
+	min-width: 10%;
+	display: inline-block;
 }
 
+#logo > a:hover {
+	cursor: pointer;
+}
 .form-signin {
     max-width: 300px;
     padding: 19px 29px 29px;

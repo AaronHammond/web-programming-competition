@@ -18,7 +18,8 @@ var app = express();
 
 
 
-var connStr = 'mongodb://localhost:27017/6470';
+//var connStr = 'mongodb://localhost:27017/6470';
+var connStr = 'mongodb://admin:herokuaccount@troup.mongohq.com:10041/app21477111'
 mongoose.connect(connStr, function(err) {
     if (err) throw err;
     console.log('Successfully connected to MongoDB');
@@ -45,6 +46,15 @@ app.use(passport.session());
 app.use(express.errorHandler());
 
 app.use(app.router);
+
+// pass along user info to jade
+app.get('*', function(req, res, next) {
+  // put user into res.locals for easy access from templates
+  res.locals.user = req.user || null;
+
+  next();
+});
+
 
 // index
 
