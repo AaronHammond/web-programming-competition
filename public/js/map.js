@@ -217,15 +217,18 @@ function getMarkerImage(datum){
  */
 function generateItinerary() {
 	populateItinerary();
+	openInfoWindows();
+}
 
+function openInfoWindows(){
 	for(var i in itinerary){
 		var landmark = itinerary[i];
 
-		var infowindow = new google.maps.InfoWindow({
+		itinerary[i].infoWindow  = new google.maps.InfoWindow({
 			content : getMarkerHTML(landmark)
 		})
 
-		infowindow.open(map, landmark.marker);
+		itinerary[i].infoWindow.open(map, landmark.marker);
 	}
 }
 
@@ -270,7 +273,40 @@ function getMarkerHTML(landmark){
  * from the same category
  */ 
 function replaceItineraryPart(index){
+	var oldItinerary = itinerary;
+	itinerary = [];
+	for(var i = 0; i < oldItinerary.length; i++){
+		oldItinerary[i].infoWindow.close();
+	}
 
+	if(index == 0){
+		itinerary.push(landmarks.restaurants[Math.floor((Math.random()*landmarks.restaurants.length))]);
+	}
+	else{
+		itinerary.push(oldItinerary[0]);
+	}
+
+	if(index == 1){
+		itinerary.push(landmarks.parks[Math.floor((Math.random()*landmarks.parks.length))]);
+	}
+	else{
+		itinerary.push(oldItinerary[1]);
+	}
+
+	if(index == 2){
+		itinerary.push(landmarks.bars[Math.floor((Math.random()*landmarks.bars.length))]);
+	}
+	else{
+		itinerary.push(oldItinerary[2]);
+	}
+
+	$('#initialPane').text('loading...');
+	getDirections();
+	$('#initialPane').fadeOut('slow', function () {
+		$('#itinerary').css('display', 'inline-block');
+		$('#itinerary').fadeIn('slow');
+	});
+	openInfoWindows();
 }
 
 
@@ -317,7 +353,7 @@ function renderDirections(route){
 		markup += '				<a data-toggle="collapse" data-parent="#directionsAccordion" href="#collapse' + i + '">';
 		markup += '					' + (i+1) + ". " + getFlavorText(itinerary[i]);
 		markup += '				</a>';
-		markup += ' 			<span class="btn btn-danger" style="float: right; font-size: 12px; vertical-align: middle; margin-top: -7px;"> No! </span>';
+		markup += ' 			<span class="btn btn-danger" style="float: right; font-size: 12px; vertical-align: middle; margin-top: -7px;" onclick="replaceItineraryPart(' + i + '); return false;"> No! </span>';
 		markup += '			 </h4>';
 		markup += '		</div>';
 		markup += '		<div id="collapse' + i + '" class="panel-collapse collapse">';
