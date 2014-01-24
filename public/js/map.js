@@ -155,8 +155,12 @@ function retrieveLandmarkMapDatum(category, yelpDatum, callback) {
 				callback();
 			}
 		}
-		else{
+		else if(gmapData.status != "ZERO_RESULTS"){
 			setTimeout(function(){retrieveLandmarkMapDatum(category, yelpDatum, callback);}, 1000);
+		}
+		else{
+			targetCounts[category]--;
+			console.log("no dice :(");
 		}
 	});
 }
