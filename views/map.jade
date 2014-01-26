@@ -11,7 +11,6 @@ html(style='height: 100%')
 
 		script(type='text/javascript', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyAYb9WeDx9yd4CQd_e6lcb3NueQyqw-7Wo&sensor=false')
 		script(type='text/javascript', src='/js/map.js')
-
 		style(type='text/css').
 			
 			body {
@@ -72,6 +71,10 @@ html(style='height: 100%')
 			#startHereBtn {
 				margin-top: 10px;
 			}
+			#saveItineraryBtn {
+				margin-top: 10px;
+				float: right;
+			}
 	body
 		
 
@@ -81,7 +84,7 @@ html(style='height: 100%')
 				h2 what should i do today?
 				a(href="/user/preferences") Preferences
 				a(href="/map") New Itinerary
-				//a Saved Itineraries
+				a(href="/user/itineraries") Saved Itineraries
 				if user
 					a(href="/user/logout") Log Out
 				else
@@ -103,6 +106,7 @@ html(style='height: 100%')
 			div(id='itinerary') 
 				h3 Your itinerary
 				div(id="directions_panel")
+				button(type = 'button' class='btn btn-success' id='saveItineraryBtn') Save Itinerary
 
 				
             

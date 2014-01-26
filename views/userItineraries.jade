@@ -1,0 +1,58 @@
+extends layout
+
+block content
+	div.callout
+
+
+
+	script(type='text/javascript').
+		$.ajax({
+			url: "/itinerary/list",
+			cache: false
+		}).done(function(response){
+			console.log(response);
+			var markup = "";
+			for(var i in response){
+				masterItinerary = response[i];
+				markup += renderItinerary(masterItinerary);
+				markup += '<hr />';
+			}
+			$('.callout').html(markup);
+		});
+
+		function renderItinerary (masterItinerary){
+			var itinerary = masterItinerary.itinerary;
+			var markup = '<div>';
+			markup += '<h3>';
+			var da = new Date(Date.parse(masterItinerary.updated));
+			markup += '<a href="/map?id=' + masterItinerary._id + '">Itinerary from ' + da.toLocaleDateString() + '</a>';
+			markup += '</h3>';
+			for(var i = 0; i < itinerary.length; i++){
+				var landmark = itinerary[i];
+
+				markup +=    '	<p>';
+				markup += 	 		getFlavorText(landmark);
+				markup +=	 '  </p>';
+				
+			}
+			markup +=    '</div>';
+			markup +=    '<br />';
+			return markup;	
+		}
+		function getFlavorText(landmark) {
+			var cat = landmark.yelpData.metacategory;
+			var flavorText;
+			if(cat == "restaurants"){
+				flavorText = "Enjoy a nice meal at ";
+			}
+			if(cat == "parks"){
+				flavorText = "Take a stroll through ";
+			}
+			if(cat == "bars"){
+				flavorText = "Order a brew (or two!) at ";
+			}
+			flavorText += '<a target="_blank" href="' + landmark.yelpData.url + '">';
+			flavorText = flavorText.concat(landmark.yelpData.name);
+			flavorText += '</a>';
+			return flavorText;
+		}

@@ -18,8 +18,8 @@ var app = express();
 
 
 
-//var connStr = 'mongodb://localhost:27017/6470';
-var connStr = 'mongodb://admin:herokuaccount@troup.mongohq.com:10041/app21477111'
+var connStr = 'mongodb://localhost:27017/6470';
+//var connStr = 'mongodb://admin:herokuaccount@troup.mongohq.com:10041/app21477111'
 mongoose.connect(connStr, function(err) {
     if (err) throw err;
     console.log('Successfully connected to MongoDB');
@@ -44,6 +44,7 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.errorHandler());
+
 
 app.use(app.router);
 
@@ -75,8 +76,14 @@ app.get('/user/logout', function(req, res){
     res.redirect('/');
 });
 
+app.get('/user/itineraries', user.showItineraries);
+
 //map
 app.get('/map', map.viewMap);
+app.post('/map/itinerary', map.saveItinerary);
+app.get('/itinerary/list', map.getSavedItineraries);
+app.get('/itinerary', map.getSavedItinerary);
+
 
 // data
 

@@ -115,6 +115,8 @@ function errythingLoaded(){
 		$('#itinerary').css('display', 'inline-block');
 		$('#itinerary').fadeIn('slow');
 	});
+
+	$('#saveItineraryBtn').click(saveItinerary);
 	
 }
 
@@ -156,7 +158,7 @@ function retrieveLandmarkMapDatum(category, yelpDatum, callback) {
 			}
 		}
 		else if(gmapData.status != "ZERO_RESULTS"){
-			setTimeout(function(){retrieveLandmarkMapDatum(category, yelpDatum, callback);}, 1000);
+			setTimeout(function(){retrieveLandmarkMapDatum(category, yelpDatum, callback);}, 100);
 		}
 		else{
 			targetCounts[category]--;
@@ -410,4 +412,32 @@ function extractLastGoogleMapStep(step){
 	else{
 		return (step.instructions + " for " + step.duration.text + " (" + step.distance.text + ") <br />");
 	}
+}
+
+function saveItinerary(){
+
+	var requestObj = {landmarks : landmarks, itinerary : itinerary, origin : origin};
+
+	for(var cat in requestObj.landmarks){
+		for(var i = 0; i < requestObj.landmarks[cat].length; i++){
+			delete requestObj.landmarks[cat][i].marker;
+			delete requestObj.landmarks[cat][i].infoWindow;
+		}
+	}
+
+	for(var i = 0; i < requestObj.itinerary.length; i++){
+		delete requestObj.itinerary[i].marker;
+		delete requestObj.itinerary[i].infoWindow;
+	}
+	$('#saveItineraryBtn').popover({content : 'Your itinerary has been saved.', placement: 'left', trigger: 'manual' });
+	$.ajax({
+		contentType: 'application/json',
+		data: JSON.stringify(requestObj),
+		dataType: 'json',
+		type: 'POST',
+		url: '/map/itinerary'
+	}).done(function(response){
+		console.log(response);
+		$('#saveItineraryBtn').popover('show');
+	});
 }

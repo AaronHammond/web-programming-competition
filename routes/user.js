@@ -77,3 +77,14 @@ exports.doLogin = passport.authenticate('local', {successRedirect: '/map',
 		});
 	});
  }
+
+ /*
+  * /user/itineraries
+  */
+
+exports.showItineraries = function(req, res){
+	if(!req.user){
+		return res.redirect('/user/login');
+	}
+	res.render('userItineraries', {msg: req.flash('error')});
+}
