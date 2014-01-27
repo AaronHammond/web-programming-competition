@@ -6,15 +6,22 @@ block content
 
 
 	script(type='text/javascript').
+		var itineraryCt = 0;
 		$.ajax({
 			url: "/itinerary/list",
 			cache: false
 		}).done(function(response){
 			console.log(response);
 			var markup = "";
+
+
 			for(var i in response){
 				masterItinerary = response[i];
 				markup += renderItinerary(masterItinerary);
+				itineraryCt++;
+			}
+			if(itineraryCt == 0){
+				markup += "<h3>You haven't created any itineraries yet. Why not <a href='/map'>make one now</a>?</h3>";
 			}
 			$('.callout').html(markup);
 		});
@@ -51,7 +58,11 @@ block content
 				cache: false,
 				type: 'POST'
 			}).done(function(response){
+				itineraryCt--;
 				$('#' + id).fadeOut('slow');
+				if(itineraryCt == 0){
+					$('.callout').html("<h3>You haven't created any itineraries yet. Why not make one <a href='/map'>now</a>?</h3>");
+				}
 			});
 
 		}
