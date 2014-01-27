@@ -75,6 +75,11 @@ html(style='height: 100%')
 				margin-top: 10px;
 				float: right;
 			}
+			#status {
+				display: none;
+				margin-top: 10px;
+				margin-bottom: 20px;
+			}
 	body
 		
 
@@ -96,6 +101,7 @@ html(style='height: 100%')
 		div(id='main-content')
 			div(id='map-canvas')
 			div(id='initialPane')
+				div#status
 				button(type='button' class='btn btn-success' id='startBtn') Generate Itinerary
 				button(type='button' class='btn btn-danger' id='somewhereElseBtn') Start Somewhere Else
 				div(id="somewhereElsePane")

@@ -78,17 +78,21 @@ function initialize() {
 		}
 		else{
 			$('#startBtn').click(function(){
-			$('#initialPane').text('loading...');
-			retrieveLandmarkData("bars", function(){
-					retrieveLandmarkData("parks", function(){
-						retrieveLandmarkData("restaurants", errythingLoaded);
-					});
-				});	
+				$('#status').text('loading...');
+				$('#status').fadeIn('slow');
+				$('#startBtn').fadeOut('slow');
+				$('#somewhereElseBtn').fadeOut('slow');
+				retrieveLandmarkData("bars", function(){
+						retrieveLandmarkData("parks", function(){
+							retrieveLandmarkData("restaurants", errythingLoaded);
+						});
+					});	
 			});
 
 			$('#somewhereElseBtn').click(function(){
 				originMarker.setMap(null);
 				$('#startBtn').fadeOut('slow');
+				$('#status').fadeOut('slow');
 				$('#somewhereElseBtn').fadeOut('slow', function(){
 					$('#somewhereElsePane').fadeIn('slow');
 				});
@@ -207,11 +211,22 @@ function errythingLoaded(){
  * example: retrieveLandmarkData("bars");
  */
 function retrieveLandmarkData(category, callback) {
+	$('#status').text('Getting data from Yelp for ' + category + '...');
 	$.ajax({
 		url: "/data/" + category + "?lat=" + origin.d + "&long=" + origin.e,
 		cache: false
 	}).done(function(yelpData){
 		targetCounts[category] = yelpData.businesses.length;
+		if(yelpData.businesses.length == 0){
+			$('#status').fadeOut('slow', function(){
+				$('#status').html('We couldn\'t find anything within walking distance :( Try searching in a city. <br />');
+				$('#status').fadeIn('slow');
+				$('#startBtn').fadeIn('slow');
+				$('#somewhereElseBtn').fadeIn('slow');
+			});
+			
+		}
+		$('#status').text('Getting data from Google Maps for ' + category + '...');
 		for(var i in yelpData.businesses){
 			var biz = yelpData.businesses[i];
 			biz.metacategory = category;
@@ -386,7 +401,7 @@ function replaceItineraryPart(index){
 		itinerary.push(oldItinerary[2]);
 	}
 
-	$('#initialPane').text('loading...');
+	
 	getDirections();
 	$('#initialPane').fadeOut('slow', function () {
 		$('#itinerary').css('display', 'inline-block');
