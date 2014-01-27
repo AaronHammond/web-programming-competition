@@ -48,8 +48,8 @@ exports.getSavedItinerary = function(req, res){
 	if(!req.user){
 		return res.redirect('/user/login');
 	}
-
-	Itinerary.findOne({_id : req.params.id}, function(err, doc){
+	console.log(req.query.id);
+	Itinerary.findOne({_id : req.query.id}, function(err, doc){
 		if(err){
 			return res.send(err);
 		}

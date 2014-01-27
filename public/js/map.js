@@ -21,7 +21,32 @@ var directionsService = new google.maps.DirectionsService();
 
 var directionsDisplay;
 
-var originMarker; 
+var originMarker;
+
+// borowed from http://stackoverflow.com/questions/979975/how-to-get-the-value-from-url-parameter
+var QueryString = function () {
+  // This function is anonymous, is executed immediately and 
+  // the return value is assigned to QueryString!
+  var query_string = {};
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    	// If first entry with this name
+    if (typeof query_string[pair[0]] === "undefined") {
+      query_string[pair[0]] = pair[1];
+    	// If second entry with this name
+    } else if (typeof query_string[pair[0]] === "string") {
+      var arr = [ query_string[pair[0]], pair[1] ];
+      query_string[pair[0]] = arr;
+    	// If third or later entry with this name
+    } else {
+      query_string[pair[0]].push(pair[1]);
+    }
+  } 
+    return query_string;
+} ();
+
 function initialize() {
 	navigator.geolocation.getCurrentPosition(function (position) {
 		origin = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -41,27 +66,82 @@ function initialize() {
 			title: "Your itinerary will start here.", 
 		});
 
-		$('#startBtn').click(function(){
+		if(QueryString.id){
+			$.ajax({
+				url: '/itinerary?id=' + QueryString.id,
+				cache: false,
+			}).done(loadExistingItinerary);
+		}
+		else{
+			$('#startBtn').click(function(){
 			$('#initialPane').text('loading...');
 			retrieveLandmarkData("bars", function(){
 					retrieveLandmarkData("parks", function(){
 						retrieveLandmarkData("restaurants", errythingLoaded);
 					});
-			});	
-		});
-
-		$('#somewhereElseBtn').click(function(){
-			originMarker.setMap(null);
-			$('#startBtn').fadeOut('slow');
-			$('#somewhereElseBtn').fadeOut('slow', function(){
-				$('#somewhereElsePane').fadeIn('slow');
+				});	
 			});
-			$('#startHereBtn').click(startSomewhereElse);
-			
-		})
+
+			$('#somewhereElseBtn').click(function(){
+				originMarker.setMap(null);
+				$('#startBtn').fadeOut('slow');
+				$('#somewhereElseBtn').fadeOut('slow', function(){
+					$('#somewhereElsePane').fadeIn('slow');
+				});
+				$('#startHereBtn').click(startSomewhereElse);
+				
+			});
+		}
+
+
+		
 		
 		
 	});		
+}
+
+function loadExistingItinerary(data){
+	console.log(data);
+	landmarks = data.landmarks;
+	origin = new google.maps.LatLng(data.origin.d, data.origin.e);
+	map.setCenter(origin);
+	originMarker.setMap(null);
+	populateItineraryPointers(data.itinerary);
+	originMarker = new google.maps.Marker({
+			map:map,
+			animation: google.maps.Animation.DROP,
+			position: origin,
+			title: "Your itinerary will start here.", 
+	});
+
+	for(cat in landmarks){
+		for(landmark in landmarks[cat]){
+			addMapPin(landmarks[cat][landmark]);
+		}
+	}
+
+	openInfoWindows();
+	getDirections();
+	$('#initialPane').fadeOut('slow', function () {
+		$('#itinerary').css('display', 'inline-block');
+		$('#itinerary').fadeIn('slow');
+	});
+
+	$('#saveItineraryBtn').click(saveItinerary);
+}
+function populateItineraryPointers(newItinerary){
+	for(var i = 0; i < newItinerary.length; i++){
+		var index = landmarkIndex(landmarks[newItinerary[i].yelpData.metacategory], newItinerary[i]);
+		itinerary.push(landmarks[newItinerary[i].yelpData.metacategory][index]);
+	}
+}
+function landmarkIndex(haystack, needle){
+	for(var i = 0; i < haystack.length; i++){
+		if(haystack[i].yelpData.name == needle.yelpData.name){
+			return i;
+		}
+	}
+	return -1;
 }
 
 function startSomewhereElse(){
