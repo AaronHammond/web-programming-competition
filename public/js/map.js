@@ -67,6 +67,10 @@ function initialize() {
 		});
 
 		if(QueryString.id){
+			$('#initialPane').fadeOut('slow', function () {
+				$('#itinerary').css('display', 'inline-block');
+				$('#itinerary').fadeIn('slow');
+			});
 			$.ajax({
 				url: '/itinerary?id=' + QueryString.id,
 				cache: false,
@@ -122,10 +126,6 @@ function loadExistingItinerary(data){
 
 	openInfoWindows();
 	getDirections();
-	$('#initialPane').fadeOut('slow', function () {
-		$('#itinerary').css('display', 'inline-block');
-		$('#itinerary').fadeIn('slow');
-	});
 
 	$('#saveItineraryBtn').click(saveItinerary);
 }

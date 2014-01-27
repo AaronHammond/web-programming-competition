@@ -58,3 +58,17 @@ exports.getSavedItinerary = function(req, res){
 		}
 	})
 }
+exports.deleteItinerary = function(req, res){
+	if(!req.user){
+		return res.redirect('/user/login');
+	}
+
+	Itinerary.findOneAndRemove({_id : req.query.id, owner : req.user._id}, function(err){
+		if(err){
+			res.send(err);
+		}
+		else{
+			res.send('OK');
+		}
+	})
+}

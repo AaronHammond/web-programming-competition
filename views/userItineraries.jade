@@ -15,17 +15,16 @@ block content
 			for(var i in response){
 				masterItinerary = response[i];
 				markup += renderItinerary(masterItinerary);
-				markup += '<hr />';
 			}
 			$('.callout').html(markup);
 		});
 
 		function renderItinerary (masterItinerary){
 			var itinerary = masterItinerary.itinerary;
-			var markup = '<div>';
+			var markup = '<div id="' + masterItinerary._id + '">';
 			markup += '<h3>';
 			var da = new Date(Date.parse(masterItinerary.updated));
-			markup += '<a href="/map?id=' + masterItinerary._id + '">Itinerary from ' + da.toLocaleDateString() + '</a>';
+			markup += 'Itinerary from ' + da.toLocaleDateString();
 			markup += '</h3>';
 			for(var i = 0; i < itinerary.length; i++){
 				var landmark = itinerary[i];
@@ -35,9 +34,26 @@ block content
 				markup +=	 '  </p>';
 				
 			}
+			markup += '<button class="btn btn-success" style="margin-right: 10px" onclick="viewItinerary(\'' + masterItinerary._id + '\'); return false;"> View Itinerary </button>';
+			markup += '<button class="btn btn-danger" onclick="deleteItinerary(\'' + masterItinerary._id + '\'); return false;"> Delete Itinerary </button>';
+			markup += '<hr />';
 			markup +=    '</div>';
-			markup +=    '<br />';
+			//markup +=    '<br />';
+
 			return markup;	
+		}
+		function viewItinerary(id){
+			location.href = ('http://' + location.host + '/map?id=' + id);
+		}
+		function deleteItinerary(id){
+			$.ajax({
+				url: "/itinerary/delete?id=" + id,
+				cache: false,
+				type: 'POST'
+			}).done(function(response){
+				$('#' + id).fadeOut('slow');
+			});
+
 		}
 		function getFlavorText(landmark) {
 			var cat = landmark.yelpData.metacategory;

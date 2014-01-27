@@ -83,7 +83,7 @@ app.get('/map', map.viewMap);
 app.post('/map/itinerary', map.saveItinerary);
 app.get('/itinerary/list', map.getSavedItineraries);
 app.get('/itinerary', map.getSavedItinerary);
-
+app.post('/itinerary/delete', map.deleteItinerary);
 
 // data
 

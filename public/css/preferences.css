@@ -37,6 +37,7 @@
 	font-family: 'Lobster';
 	display: inline-block;
 	min-width: 60%;
+	cursor: default;
 }
 #logo > a {
 	min-width: 10%;
